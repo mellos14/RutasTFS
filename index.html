@@ -394,7 +394,7 @@ textarea.input-field { resize: none; min-height: 80px; }
 </div>
 
 <script>
-const APP_URL = 'https://script.google.com/macros/s/AKfycbwUknjdkzYWX1WtZtU5wp2qdv4Ss-hAGefoBVJ4XwG5YrkxQZM29ulpr67HMeX69QUpWA/exec';
+const APP_URL = 'https://script.google.com/macros/s/AKfycbz4iIi5mjPrxmk1cq0YkxanmT6KWanU8RakjIpNESJSJbvrD8YqCoPYHPQ2AJV4Vn8/exec';
 
 let choferActivo = '', albaranesData = [], filtroActivo = 'todos';
 let albActual = null, estadoSel = '', firmadoSel = '', cobradoSel = '';
@@ -500,7 +500,29 @@ function selFirmado(val,btn){firmadoSel=val;document.querySelectorAll('#ops-firm
 function selCobrado(val,btn){cobradoSel=val;document.querySelectorAll('#ops-cobrado .opcion-btn').forEach(b=>b.className='opcion-btn');btn.className='opcion-btn sel';document.getElementById('importe-cobrado').style.display=val==='Sí'?'block':'none';}
 function validarForm(){document.getElementById('btn-guardar').disabled=!(estadoSel&&firmadoSel);}
 
-function procesarFoto(input){const file=input.files[0];if(!file)return;fotoMime=file.type;const r=new FileReader();r.onload=e=>{fotoBase64=e.target.result;document.getElementById('foto-preview').src=fotoBase64;document.getElementById('foto-preview').style.display='block';document.getElementById('foto-area').classList.add('has-foto');};r.readAsDataURL(file);}
+function procesarFoto(input){
+  const file=input.files[0];if(!file)return;
+  fotoMime='image/jpeg';
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const img=new Image();
+    img.onload=()=>{
+      const canvas=document.createElement('canvas');
+      const maxW=800;
+      const ratio=Math.min(maxW/img.width,maxW/img.height,1);
+      canvas.width=Math.round(img.width*ratio);
+      canvas.height=Math.round(img.height*ratio);
+      const ctx=canvas.getContext('2d');
+      ctx.drawImage(img,0,0,canvas.width,canvas.height);
+      fotoBase64=canvas.toDataURL('image/jpeg',0.6);
+      document.getElementById('foto-preview').src=fotoBase64;
+      document.getElementById('foto-preview').style.display='block';
+      document.getElementById('foto-area').classList.add('has-foto');
+    };
+    img.src=e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
 
 function obtenerGPS(){
   const dot=document.getElementById('gps-dot'),txt=document.getElementById('gps-text');
@@ -517,7 +539,7 @@ async function guardarEntrega(){
   const btn=document.getElementById('btn-guardar');btn.disabled=true;btn.textContent='Guardando...';
   try{
     let fotoUrl=albActual.foto_albaran||'';
-    if(fotoBase64){mostrarToast('📷 Subiendo foto...');const rF=await fetch(APP_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'subirFoto',base64:fotoBase64,mimeType:fotoMime,num_albaran:albActual.num_albaran,chofer:choferActivo})});const dF=await rF.json();if(dF.url)fotoUrl=dF.url;}
+    if(fotoBase64){mostrarToast('📷 Subiendo foto...');const rF=await api({action:'subirFoto',base64:fotoBase64,mimeType:fotoMime,num_albaran:albActual.num_albaran,chofer:choferActivo});if(rF.url)fotoUrl=rF.url;}
     const res=await api({action:'guardarEntrega',fila:albActual.fila,estado_entrega:estadoSel,firmado:firmadoSel,foto_url:fotoUrl,incidencia:document.getElementById('incidencia-texto').value,cobrado:cobradoSel,importe_cobrado:document.getElementById('importe-cobrado').value,gps:gpsCoords||''});
     if(res.ok){const idx=albaranesData.findIndex(a=>a.fila===albActual.fila);if(idx>=0){albaranesData[idx].estado_entrega=estadoSel;albaranesData[idx].firmado=firmadoSel;}mostrarToast('✅ Entrega guardada');setTimeout(()=>volverAlbaranes(),1000);}
     else throw new Error(res.error||'Error al guardar');

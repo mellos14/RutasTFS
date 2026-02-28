@@ -539,7 +539,7 @@ function obtenerGPS(){
   if(!navigator.geolocation){dot.className='gps-dot';txt.textContent='GPS no disponible';return;}
   dot.className='gps-dot loading';txt.textContent='Obteniendo ubicación...';
   navigator.geolocation.getCurrentPosition(
-    pos=>{gpsCoords=pos.coords.latitude.toFixed(6)+', '+pos.coords.longitude.toFixed(6);dot.className='gps-dot ok';txt.textContent='📍 '+gpsCoords;},
+    pos=>{const lat=pos.coords.latitude.toFixed(6),lng=pos.coords.longitude.toFixed(6);gpsCoords='https://www.google.com/maps?q='+lat+','+lng;dot.className='gps-dot ok';txt.textContent='📍 Ubicación obtenida';},
     ()=>{dot.className='gps-dot';txt.textContent='No se pudo obtener ubicación';},
     {enableHighAccuracy:true,timeout:10000}
   );

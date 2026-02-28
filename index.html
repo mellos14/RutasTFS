@@ -394,7 +394,7 @@ textarea.input-field { resize: none; min-height: 80px; }
 </div>
 
 <script>
-const APP_URL = 'https://script.google.com/macros/s/AKfycbxxQqvX-A84uEI9pSx0GXULIgd2OO5OavpHe0YX9ZdvQ6ijOUdsoNtvOUirWSGX9kGKkg/exec';
+const APP_URL = 'https://script.google.com/macros/s/AKfycbzWDgwY6wCO1uPfX-gbVy-4fmUu7oOftEwt4W2FRNDYSpffD5G5jrwg26Ki_Fgpm-oBqw/exec';
 
 let choferActivo = '', albaranesData = [], filtroActivo = 'todos';
 let albActual = null, estadoSel = '', firmadoSel = '', cobradoSel = '';
@@ -467,7 +467,7 @@ function renderAlbaranes() {
   if(!lista.length){el.innerHTML='<div class="empty"><div class="empty-icon">📭</div><p>Sin albaranes en este filtro</p></div>';return;}
   el.innerHTML=lista.map(alb=>{
     const css=alb.estado_entrega==='Entregado'?'entregado':alb.estado_entrega==='Incidencia'?'incidencia':alb.estado_entrega==='No estaba'?'no-estaba':alb.estado_entrega==='Rechazó'?'rechazo':'';
-    const bF=alb.facturado==='Sí'?'<span class="alb-badge badge-fact">💶 Facturado</span>':'<span class="alb-badge badge-nofact">📋 Sin factura</span>';
+    const esFacturado=alb.facturado==='Sí'||alb.facturado==='Si';const bF=esFacturado?'<span class="alb-badge badge-fact">💶 Facturado</span>':'<span class="alb-badge badge-nofact">📋 Sin factura</span>';
     const bE=alb.estado_entrega?'<span class="alb-badge badge-est">'+alb.estado_entrega+'</span>':'';
     const nt=alb.notas?'<div class="alb-notas">⚠️ '+alb.notas+'</div>':'';
     return '<div class="albaran-card '+css+'" onclick="abrirForm('+alb.fila+')">'+
@@ -489,10 +489,10 @@ function abrirForm(fila) {
   document.getElementById('f-cliente').textContent=albActual.cliente;
   document.getElementById('f-dir').textContent=(albActual.direccion||'')+' '+(albActual.ciudad||'');
   document.getElementById('f-importe').textContent=parseFloat(albActual.importe||0).toFixed(2)+'€';
-  document.getElementById('f-facturado').textContent=albActual.facturado==='Sí'?'✅ Sí':'❌ No';
+  const fact=albActual.facturado==='Sí'||albActual.facturado==='Si';document.getElementById('f-facturado').textContent=fact?'✅ Sí':'❌ No';
   if(albActual.notas){document.getElementById('f-notas-row').style.display='flex';document.getElementById('f-notas').textContent=albActual.notas;}
   else document.getElementById('f-notas-row').style.display='none';
-  document.getElementById('seccion-cobro').style.display=albActual.facturado==='Sí'?'block':'none';
+  document.getElementById('seccion-cobro').style.display=fact?'block':'none';
   document.getElementById('seccion-incidencia').style.display='none';
   document.getElementById('importe-cobrado').value=albActual.importe_cobrado||'';
   document.getElementById('incidencia-texto').value=albActual.incidencia||'';

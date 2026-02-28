@@ -541,7 +541,7 @@ async function guardarEntrega(){
   const btn=document.getElementById('btn-guardar');btn.disabled=true;btn.textContent='Guardando...';
   try{
     let fotoUrl=albActual.foto_albaran||'';
-    if(fotoBase64){mostrarToast('📷 Subiendo foto...');const rF=await api({action:'subirFoto',base64:fotoBase64,mimeType:fotoMime,num_albaran:albActual.num_albaran,chofer:choferActivo});mostrarToast('R:'+JSON.stringify(rF));if(rF.url)fotoUrl=rF.url;}
+    if(fotoBase64){mostrarToast('📷 Subiendo a Holded...');const rF=await api({action:'subirFoto',base64:fotoBase64,mimeType:'image/jpeg',num_albaran:albActual.num_albaran,chofer:choferActivo,id_holded:albActual.id_holded,fila:albActual.fila});if(rF.error)mostrarToast('⚠️ Foto: '+rF.error);else mostrarToast('✅ Foto adjuntada en Holded');}
     const res=await api({action:'guardarEntrega',fila:albActual.fila,estado_entrega:estadoSel,firmado:firmadoSel,foto_url:fotoUrl,incidencia:document.getElementById('incidencia-texto').value,cobrado:cobradoSel,importe_cobrado:document.getElementById('importe-cobrado').value,gps:gpsCoords||''});
     if(res.ok){const idx=albaranesData.findIndex(a=>a.fila===albActual.fila);if(idx>=0){albaranesData[idx].estado_entrega=estadoSel;albaranesData[idx].firmado=firmadoSel;}mostrarToast('✅ Entrega guardada');setTimeout(()=>volverAlbaranes(),1000);}
     else throw new Error(res.error||'Error al guardar');
@@ -549,7 +549,7 @@ async function guardarEntrega(){
 }
 
 function mostrarScreen(n){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById('screen-'+n).classList.add('active');window.scrollTo(0,0);}
-function mostrarToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),8000);}
+function mostrarToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
 </script>
 </body>
 </html>

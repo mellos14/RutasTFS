@@ -516,13 +516,13 @@ function procesarFoto(input){
     const img=new Image();
     img.onload=()=>{
       const canvas=document.createElement('canvas');
-      const maxW=600;
+      const maxW=1200;
       const ratio=Math.min(maxW/img.width,maxW/img.height,1);
       canvas.width=Math.round(img.width*ratio);
       canvas.height=Math.round(img.height*ratio);
       const ctx=canvas.getContext('2d');
       ctx.drawImage(img,0,0,canvas.width,canvas.height);
-      fotoBase64=canvas.toDataURL('image/jpeg',0.3);
+      fotoBase64=canvas.toDataURL('image/jpeg',0.7);
       const kb=Math.round(fotoBase64.length/1024);
       mostrarToast('📷 Foto: '+kb+'KB');
       document.getElementById('foto-preview').src=fotoBase64;
